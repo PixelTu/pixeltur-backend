@@ -32,3 +32,20 @@ wss.on("connection", async (ws) => {
     }
   });
 });
+
+// --- AFK farm mantığı: sürekli beyaz pikseli (1,1)'e yaz ---
+async function keepWhitePixelAlive() {
+  try {
+    await pool.query(`
+      INSERT INTO pixels (x, y, color)
+      VALUES (1, 1, '#FFFFFF')
+      ON CONFLICT (x, y) DO UPDATE SET color = '#FFFFFF';
+    `);
+    console.log("Beyaz piksel (1,1) güncellendi");
+  } catch (err) {
+    console.error("Beyaz piksel hatası:", err);
+  }
+}
+
+// her 10 saniyede bir çalıştır
+setInterval(keepWhitePixelAlive, 10000);
